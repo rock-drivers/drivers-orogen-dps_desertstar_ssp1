@@ -1,3 +1,35 @@
 name 'dps'
 version '0.1'
 # Find documentation at http://doudou.github.com/orogen/
+
+using_library 'dps'
+import_types_from 'base'
+import_types_from 'dps/dps_types.h'
+
+task_context 'Task' do
+	needs_configuration
+	#fd_driven
+	
+	property("device", "/std/string").
+            doc "the device file used to connect to the dps"
+    
+       property("period",   "double").
+            doc "the update period"
+      
+      output_port("pressure", "/dps/PressureReading").
+           doc "the pressure as reported by the hardware"
+
+
+end
+
+
+deployment "dps" do
+    #	do_not_install
+    dps_task = task("dps", "Task").
+      periodic(0.0005)
+
+    add_default_logger
+    if !corba_enabled?
+        browse dps_task
+    end
+end
