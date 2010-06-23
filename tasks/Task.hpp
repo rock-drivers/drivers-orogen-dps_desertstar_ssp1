@@ -6,7 +6,7 @@
 
 namespace RTT
 {
-    class NonPeriodicActivity;
+    class FileDescriptorActivity;
 }
 
 
@@ -22,8 +22,8 @@ namespace dps {
     public:
         Task(std::string const& name = "dps::Task");
 
-        RTT::NonPeriodicActivity* getNonPeriodicActivity();
-
+	RTT::FileDescriptorActivity* getFileDescriptorActivity();
+	
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
          * component will stay in PreOperational. Otherwise, it goes into

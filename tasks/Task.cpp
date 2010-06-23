@@ -1,13 +1,12 @@
 #include "Task.hpp"
 
-#include <rtt/NonPeriodicActivity.hpp>
 #include "../../../drivers/dps/src/dps.h"
-
+#include <rtt/FileDescriptorActivity.hpp>
 using namespace dps;
 
 
-RTT::NonPeriodicActivity* Task::getNonPeriodicActivity()
-{ return dynamic_cast< RTT::NonPeriodicActivity* >(getActivity().get()); }
+RTT::FileDescriptorActivity* Task::getFileDescriptorActivity()
+{ return dynamic_cast< RTT::FileDescriptorActivity* >(getActivity().get()); }
 
 
 Task::Task(std::string const& name)
@@ -25,11 +24,21 @@ Task::Task(std::string const& name)
 
  bool Task::configureHook()
  {
-     return true;
+    char sys_stty_cmd[100];
+    sprintf(sys_stty_cmd,"stty -F %s 4800 cs8", _device.get().c_str());
+    system(sys_stty_cmd);
+    
+    // Open the device that is listed in the _device string property
+    dps.comPort = open(_device.get().c_str(), O_RDONLY);
+    if (dps.comPort == -1)
+        return false;
+
+    getFileDescriptorActivity()->watch(dps.comPort);
+    getFileDescriptorActivity()->setTimeout(500);
+    return true;
  }
  bool Task::startHook()
  {
-	dps.openComPort("/dev/ttyS0");
 	dps.flushPort(0);
         dps.the_file_stream.open("dps.txt");
      return true;
@@ -37,39 +46,64 @@ Task::Task(std::string const& name)
 
  void Task::updateHook()
  {
-     dps.prevChar = dps.currChar;
-	  dps.currChar = dps.getCharFromPort();
-	  //std::cerr << dps.currChar;
-	  dps.the_file_stream << dps.currChar;
-	  dps.the_file_stream.flush();
+   
+  RTT::FileDescriptorActivity* fd_activity = getFileDescriptorActivity();
+  if (fd_activity)
+  {
+    if (fd_activity->hasError())
+    {
+      std::cerr << "error!" << std::endl;
+    }
+    else if (fd_activity->hasTimeout())
+    {
+      std::cerr << "DPS module: timeout! did not receive any data via the com port, going fatal..." << std::endl;
+      fatal(IO_ERROR);
+    }
+    else
+    {
+      // If there is more than one FD, discriminate. Otherwise,
+      // we don't need to use isUpdated
+      if (fd_activity->isUpdated(dps.comPort))
+      {
+	dps.prevChar = dps.currChar;
+	dps.currChar = dps.getCharFromPort();
+	//std::cerr << dps.currChar;
+	dps.the_file_stream << dps.currChar;
+	dps.the_file_stream.flush();
 
-	  dps.readBuffer.push_back(dps.currChar);
+	dps.readBuffer.push_back(dps.currChar);
 
-	  if(dps.prevChar == 'D' && dps.currChar == 'P')
+	if(dps.prevChar == 'D' && dps.currChar == 'P')
+	{
+	  if(!dps.receivedFirstTimeStamp)
 	  {
-	    if(!dps.receivedFirstTimeStamp)
-	    {
-	      dps.readBuffer.clear();
-	      dps.receivedFirstTimeStamp = true;
-	    }
+	    dps.readBuffer.clear();
+	    dps.receivedFirstTimeStamp = true;
+	  }
+	  else
+	  {
+	    if(!dps.receivedSecondTimeStamp)
+	    dps.receivedSecondTimeStamp = true;
 	    else
 	    {
-	      if(!dps.receivedSecondTimeStamp)
-	      dps.receivedSecondTimeStamp = true;
-	      else
-	      {
-		dps::PressureReading pr;
-		//std::cerr << "now getting curr speeds from this string:\n\n" << dps.readBuffer << "\n\n this was the string\n";
-		dps.getPressureFromString(dps.readBuffer, pr);
-		//std::cerr << dps.readBuffer << std::endl;
-		dps.printPressure(pr);
-		//_dps_speeds.write(speeds);
-		_pressure.write(pr);
-		//CvMat img = dps.getSpeedVis(speeds);
-		//cvShowImage("DVL", &img);
-	      }
+	      dps::PressureReading pr;
+	      //std::cerr << "now getting curr speeds from this string:\n\n" << dps.readBuffer << "\n\n this was the string\n";
+	      dps.getPressureFromString(dps.readBuffer, pr);
+	      //std::cerr << dps.readBuffer << std::endl;
+	      //dps.printPressure(pr);
+	      //_dps_speeds.write(speeds);
+	      _pressure.write(pr);
+	      //CvMat img = dps.getSpeedVis(speeds);
+	      //cvShowImage("DVL", &img);
 	    }
 	  }
+	}
+      }
+    }
+  }
+
+   
+
  }
 
 // void Task::errorHook()
