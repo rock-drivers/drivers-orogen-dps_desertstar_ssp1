@@ -1,0 +1,13 @@
+<package>
+  <description brief="module which uses the DPS (digital pressure sensor) driver to receive absolute pressure readings from the HW">
+  </description>
+  <author>Christopher Gaudig/christopher.gaudig@dfki.de</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <depend package="drivers/dps"/>
+  <versioncontrol type="git" url="" />
+  <export>
+    <cpp cflags="" lflags="" />
+  </export>
+</package>
