@@ -1,12 +1,11 @@
 #include "Task.hpp"
 
 #include "../../../drivers/dps/src/dps.h"
-#include <rtt/FileDescriptorActivity.hpp>
+#include <rtt/extras/FileDescriptorActivity.hpp>
 using namespace dps;
 
 
-RTT::FileDescriptorActivity* Task::getFileDescriptorActivity()
-{ return dynamic_cast< RTT::FileDescriptorActivity* >(getActivity().get()); }
+
 
 
 Task::Task(std::string const& name)
@@ -24,6 +23,10 @@ Task::Task(std::string const& name)
 
  bool Task::configureHook()
  {
+    RTT::extras::FileDescriptorActivity* activity =
+  getActivity<RTT::extras::FileDescriptorActivity>();
+
+
     char sys_stty_cmd[100];
     sprintf(sys_stty_cmd,"stty -F %s 4800 cs8", _device.get().c_str());
     system(sys_stty_cmd);
@@ -33,8 +36,8 @@ Task::Task(std::string const& name)
     if (dps.comPort == -1)
         return false;
 
-    getFileDescriptorActivity()->watch(dps.comPort);
-    getFileDescriptorActivity()->setTimeout(500);
+    activity->watch(dps.comPort);
+    activity->setTimeout(500);
     return true;
  }
  bool Task::startHook()
@@ -47,7 +50,8 @@ Task::Task(std::string const& name)
  void Task::updateHook()
  {
    
-  RTT::FileDescriptorActivity* fd_activity = getFileDescriptorActivity();
+      RTT::extras::FileDescriptorActivity* fd_activity =
+  getActivity<RTT::extras::FileDescriptorActivity>();
   if (fd_activity)
   {
     if (fd_activity->hasError())
