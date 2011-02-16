@@ -5,7 +5,7 @@
   <license></license>
   <url>http://</url>
   <logo>http://</logo>
-  <depend package="drivers/dps"/>
+  <depend package="drivers/dps/desertstar_ssp1"/>
   <versioncontrol type="git" url="" />
   <export>
     <cpp cflags="" lflags="" />
