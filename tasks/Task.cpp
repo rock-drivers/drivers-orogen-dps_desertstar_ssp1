@@ -1,8 +1,8 @@
 #include "Task.hpp"
 
-#include "../../../drivers/dps/src/dps.h"
+#include <dps/dps.h>
 #include <rtt/extras/FileDescriptorActivity.hpp>
-using namespace dps;
+using namespace desertstar_ssp1;
 
 
 

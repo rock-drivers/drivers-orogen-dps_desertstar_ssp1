@@ -1,22 +1,22 @@
 #ifndef DPS_TASK_TASK_HPP
 #define DPS_TASK_TASK_HPP
 
-#include "dps/TaskBase.hpp"
+#include "desertstar_ssp1/TaskBase.hpp"
 #include "dps/dps.h"
 
 
 
-namespace dps {
+namespace desertstar_ssp1 {
     class Task : public TaskBase
     {
 	friend class TaskBase;
     protected:
-        DPS dps;
+        dps::DPS dps;
 
     
 
     public:
-        Task(std::string const& name = "dps::Task");
+        Task(std::string const& name = "desertstar_ssp1::Task");
 
 
 	

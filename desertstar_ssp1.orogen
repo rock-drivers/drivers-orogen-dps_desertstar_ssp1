@@ -2,9 +2,9 @@ name 'desertstar_ssp1'
 version '0.1'
 # Find documentation at http://doudou.github.com/orogen/
 
-using_library 'desertstar_ssp1'
+using_library 'dps'
 import_types_from 'base'
-import_types_from 'desertstar_ssp1/dps_types.h'
+import_types_from 'dps/dps_types.h'
 
 task_context 'Task' do
 	needs_configuration
