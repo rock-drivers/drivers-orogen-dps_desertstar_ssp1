@@ -6,6 +6,10 @@ using_library 'dps'
 import_types_from 'base'
 import_types_from 'dps/dps_types.h'
 
+typekit do
+  export_types '/dps/PressureReading'
+end
+
 task_context 'Task' do
 	needs_configuration
 	required_activity :fd_driven
@@ -16,9 +20,13 @@ task_context 'Task' do
     
        property("period",   "double").
             doc "the update period"
+
+      property("filter_width", "int")
       
       output_port("pressure", "/dps/PressureReading").
            doc "the pressure as reported by the hardware"
+
+      output_port("pressure_double", "double")
 
     fatal_states :IO_ERROR
 
