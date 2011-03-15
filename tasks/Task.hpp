@@ -12,6 +12,7 @@ namespace desertstar_ssp1 {
 	friend class TaskBase;
     protected:
         dps::DPS dps;
+	double IIR;
 
     
 

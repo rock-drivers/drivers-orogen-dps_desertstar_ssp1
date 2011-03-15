@@ -4,13 +4,23 @@
 #include <rtt/extras/FileDescriptorActivity.hpp>
 using namespace desertstar_ssp1;
 
+double median(std::deque<double> &v)
+{
+    int n = v.size() / 2;
+    nth_element(v.begin(), v.begin()+n, v.end());
+    return v[n];
+}
 
 
+std::deque<double> dps_readings;
 
+
+int window_width = 7;
 
 Task::Task(std::string const& name)
     : TaskBase(name)
 {
+	IIR = 0.0;
 }
 
 
@@ -26,6 +36,7 @@ Task::Task(std::string const& name)
     RTT::extras::FileDescriptorActivity* activity =
   getActivity<RTT::extras::FileDescriptorActivity>();
 
+    window_width = _filter_width;
 
     char sys_stty_cmd[100];
     sprintf(sys_stty_cmd,"stty -F %s 4800 cs8", _device.get().c_str());
@@ -94,9 +105,33 @@ Task::Task(std::string const& name)
 	      //std::cerr << "now getting curr speeds from this string:\n\n" << dps.readBuffer << "\n\n this was the string\n";
 	      dps.getPressureFromString(dps.readBuffer, pr);
 	      //std::cerr << dps.readBuffer << std::endl;
-	      //dps.printPressure(pr);
+//	      dps.printPressure(pr);
 	      //_dps_speeds.write(speeds);
 	      _pressure.write(pr);
+IIR = IIR * 0.95 + pr.pressure * 0.05;
+//cout << "pressure (iir): " << IIR << "\n";
+
+dps_readings.push_back(pr.pressure);
+
+//std::cerr << "back-pushed " << pr.pressure << std::endl;
+
+if(dps_readings.size() > window_width)
+    dps_readings.pop_front();
+
+std::deque<double> sort_deque = dps_readings;
+
+double sum = 0;
+for(int i = 0 ; i < sort_deque.size() ; i++)
+    sum += sort_deque[i];
+
+double moving_avg = sum / sort_deque.size();
+
+std::cerr 
+<< "median = " << median(sort_deque) << ", moving avg = " << moving_avg << " "
+ << std::endl;
+
+              _pressure_double.write(moving_avg);
+
 	      //CvMat img = dps.getSpeedVis(speeds);
 	      //cvShowImage("DVL", &img);
 	    }
