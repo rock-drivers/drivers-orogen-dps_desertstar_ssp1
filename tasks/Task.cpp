@@ -108,7 +108,11 @@ Task::Task(std::string const& name)
 //	      dps.printPressure(pr);
 	      //_dps_speeds.write(speeds);
 	      base::samples::RigidBodyState rbs;
-	      rbs.position[2] = (pr.pressure-1.0) * 10.0;
+	      base::Vector3d pos;
+	      rbs.time = base::Time::now();
+	      pos[0] = pos[1] = 0.0;
+	      pos[2] = (pr.pressure-1.0) * 10.0;
+	      rbs.position = pos;
 	      _depth_samples.write(rbs);
 	      _pressure.write(pr);
 IIR = IIR * 0.95 + pr.pressure * 0.05;
