@@ -26,6 +26,9 @@ task_context 'Task' do
       output_port("pressure", "/dps/PressureReading").
            doc "the pressure as reported by the hardware"
 
+      output_port('depth_samples', '/base/samples/RigidBodyState').
+        doc 'provides timestamped depth samples reported by the DPS.'
+
       output_port("pressure_double", "double")
 
     fatal_states :IO_ERROR

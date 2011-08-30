@@ -107,6 +107,9 @@ Task::Task(std::string const& name)
 	      //std::cerr << dps.readBuffer << std::endl;
 //	      dps.printPressure(pr);
 	      //_dps_speeds.write(speeds);
+	      base::samples::RigidBodyState rbs;
+	      rbs.position[2] = (pr.pressure-1.0) * 10.0;
+	      _depth_samples.write(rbs);
 	      _pressure.write(pr);
 IIR = IIR * 0.95 + pr.pressure * 0.05;
 //cout << "pressure (iir): " << IIR << "\n";
