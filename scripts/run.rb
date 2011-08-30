@@ -11,6 +11,8 @@ Orocos.run 'dps' do
 
   dps.device = '/dev/ttyS0'
 
+  dps.filter_width = 30;
+
   dps.configure
   dps.start
 
