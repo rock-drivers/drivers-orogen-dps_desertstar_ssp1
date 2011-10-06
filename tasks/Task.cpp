@@ -111,7 +111,7 @@ Task::Task(std::string const& name)
 	      base::Vector3d pos;
 	      rbs.time = base::Time::now();
 	      pos[0] = pos[1] = 0.0;
-	      pos[2] = (pr.pressure-1.0) * 10.0;
+	      pos[2] = (pr.pressure-1.0) * -10.0;
 	      rbs.position = pos;
 	      rbs.cov_position(2,2) = 0.0216505327374;
 	      _depth_samples.write(rbs);
