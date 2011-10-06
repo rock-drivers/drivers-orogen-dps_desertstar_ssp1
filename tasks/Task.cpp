@@ -113,6 +113,7 @@ Task::Task(std::string const& name)
 	      pos[0] = pos[1] = 0.0;
 	      pos[2] = (pr.pressure-1.0) * 10.0;
 	      rbs.position = pos;
+	      rbs.cov_position(2,2) = 0.0216505327374;
 	      _depth_samples.write(rbs);
 	      _pressure.write(pr);
 IIR = IIR * 0.95 + pr.pressure * 0.05;
@@ -134,7 +135,7 @@ for(int i = 0 ; i < sort_deque.size() ; i++)
 double moving_avg = sum / sort_deque.size();
 
 std::cerr 
-<< "median = " << median(sort_deque) << ", moving avg = " << moving_avg << " "
+<< "raw = " << pr.pressure << "median = " << median(sort_deque) << ", moving avg = " << moving_avg << " "
  << std::endl;
 
               _pressure_double.write(moving_avg);
