@@ -3,6 +3,7 @@
 
 require 'orocos'
 include Orocos
+Orocos::CORBA.name_service = "192.168.128.20"
 Orocos.initialize
 
 Orocos.run 'dps' do
