@@ -1,6 +1,5 @@
 name 'desertstar_ssp1'
-version '0.1'
-# Find documentation at http://doudou.github.com/orogen/
+version '0.2'
 
 using_library 'dps'
 import_types_from 'base'
@@ -14,14 +13,11 @@ task_context 'Task' do
 	needs_configuration
 	required_activity :fd_driven
 
-	
-	property("device", "/std/string").
+      property("device", "/std/string").
             doc "the device file used to connect to the dps"
     
-       property("period",   "double").
-            doc "the update period"
-
-      property("filter_width", "int")
+      property("pressure_covariance", "double", 0.0216505327374).
+             doc "covariance for the pressure reading."
       
       output_port("pressure", "/dps/PressureReading").
            doc "the pressure as reported by the hardware"
@@ -29,18 +25,13 @@ task_context 'Task' do
       output_port('depth_samples', '/base/samples/RigidBodyState').
         doc 'provides timestamped depth samples reported by the DPS.'
 
-      output_port("pressure_double", "double")
-
     fatal_states :IO_ERROR
 
 end
 
-
 deployment "dps" do
-    #	do_not_install
+    do_not_install
     dps_task = task("dps", "Task")
-    #  periodic(0.0005)
-    
 
     add_default_logger
     if !corba_enabled?
