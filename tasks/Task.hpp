@@ -12,7 +12,8 @@ namespace desertstar_ssp1 {
 	friend class TaskBase;
     protected:
         dps::DPS dps;
-
+	std::list<dps::PressureReading> readings;
+	bool smoothReading(const dps::PressureReading& reading, dps::PressureReading& mean);
     
 
     public:

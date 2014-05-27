@@ -9,6 +9,41 @@ Task::Task(std::string const& name)
 {
 }
 
+bool Task::smoothReading(const dps::PressureReading& reading, dps::PressureReading& mean)
+{
+    if(_window_size.get() < 2)
+	return false;
+    
+    // apply filter
+    readings.push_front(reading);
+    while(readings.size() > _window_size.get())
+	readings.pop_back();
+    
+    double lambda = _lambda.get();
+    if(lambda <= 0.0 || lambda > 1.0)
+	lambda = 1.0;
+    if(readings.size() == _window_size.get())
+    {
+	double mean_pressure = 0.0;
+	double sum_weight = 0.0;
+	double sample_count = 1.0;
+	for(std::list<dps::PressureReading>::const_iterator it = readings.begin(); it != readings.end(); it++)
+	{
+	    double weight = pow(lambda, sample_count);
+	    mean_pressure += weight * it->pressure;
+	    sum_weight += weight;
+	    sample_count++;
+	}
+	mean_pressure /= sum_weight;
+	
+	mean.pressure = mean_pressure;
+	mean.timestamp = reading.timestamp;
+	return true;
+    }
+    
+    return false;
+}
+
 bool Task::configureHook()
 {
   RTT::extras::FileDescriptorActivity* activity =
@@ -77,22 +112,28 @@ void Task::updateHook()
 	    dps.receivedSecondTimeStamp = true;
 	    else
 	    {
-	      dps::PressureReading pr;
-	      dps.getPressureFromString(dps.readBuffer, pr);
-              //dps.printPressure(pr);
-	      //_dps_speeds.write(speeds);
-	      base::samples::RigidBodyState rbs;
-	      base::Vector3d pos;
-	      rbs.time = base::Time::now();
-              // use rbs to output pressure. x and y fields are set to zero
-	      pos[0] = pos[1] = 0.0;
-              // z coordinate is set to depth in meters (directly calculated from pressure, 1m = 0.1bar 
-	      pos[2] = (pr.pressure-1.0) * -10.0;
-	      rbs.position = pos;
-              // covariance for pressure
-	      rbs.cov_position(2,2) = _pressure_covariance;
-	      _depth_samples.write(rbs);
-	      _pressure.write(pr);
+		dps::PressureReading pr;
+		dps.getPressureFromString(dps.readBuffer, pr);
+		_pressure.write(pr);
+
+		//dps.printPressure(pr);
+		//_dps_speeds.write(speeds);
+		base::samples::RigidBodyState rbs;
+		base::Vector3d pos;
+		rbs.time = base::Time::now();
+		// use rbs to output pressure. x and y fields are set to zero
+		pos[0] = pos[1] = 0.0;
+		// z coordinate is set to depth in meters (directly calculated from pressure, 1m = 0.1bar 
+		dps::PressureReading mean_pressure;
+		if(smoothReading(pr, mean_pressure))
+		    pos[2] = (mean_pressure.pressure-1.0) * -10.0;
+		else
+		    pos[2] = (pr.pressure-1.0) * -10.0;
+		rbs.position = pos;
+		// covariance for pressure
+		rbs.cov_position = base::samples::RigidBodyState::setValueUnknown();
+		rbs.cov_position(2,2) = _pressure_covariance;
+		_depth_samples.write(rbs);
 	    }
 	  }
 	}

@@ -18,6 +18,12 @@ task_context 'Task' do
     
       property("pressure_covariance", "double", 0.0216505327374).
              doc "covariance for the pressure reading."
+             
+      ## Smoothing parameters
+      property("window_size", "int", 0).
+             doc "Window size of the smoothing. A size smaller than 2 deactivates the smoothing."
+      property("lambda", "double", 1.0).
+             doc "Weighting of the smoothing process. Lambda in (0..1]. A value of 1 leads to equal weighting."
       
       output_port("pressure", "/dps/PressureReading").
            doc "the pressure as reported by the hardware"
