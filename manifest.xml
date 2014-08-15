@@ -1,0 +1,12 @@
+<package>
+  <description brief="This driver is the rock interface to the DesertStart SSP1 pressure sensor">
+  
+  </description>
+  <author>Matthias Goldhoorn/matthias.goldhoorn@uni-bremen.de</author>
+  <license>LGPLv2 or later</license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <depend package="base/cmake" />
+  <depend package="drivers/dps_desertstar_ssp1" />
+  <depend package="drivers/orogen/aggregator"/>
+</package>

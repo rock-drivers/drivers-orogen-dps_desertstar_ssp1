@@ -1,0 +1,38 @@
+name 'dps_desertstar_ssp1'
+version '1.0'
+
+using_library 'dps_desertstar_ssp1'
+import_types_from 'base'
+using_library "aggregator"
+import_types_from "aggregator"
+
+task_context 'Task' do
+    needs_configuration
+    required_activity :fd_driven
+
+    property("port", "/std/string").
+        doc "the device file used to connect to the dps"
+   
+    #The default timeout for the device before a ioerror is announces
+    property("timeout","/double",0.5)
+
+#    ## Smoothing parameters
+#    property("window_size", "int", 0).
+#        doc "Window size of the smoothing. A size smaller than 2 deactivates the smoothing."
+#
+#    property("lambda", "double", 1.0).
+#        doc "Weighting of the smoothing process. Lambda in (0..1]. A value of 1 leads to equal weighting."
+#
+#    output_port("pressure", "/dps/PressureReading").
+#        doc "the pressure as reported by the hardware"
+
+    output_port('depth_samples', '/base/samples/RigidBodyState').
+        doc 'provides timestamped depth samples reported by the DPS.'
+    
+    output_port('temperature', '/double').
+        doc 'The Temperature the device reads'
+
+    output_port "timestamp_estimator_status", "/aggregator/TimestampEstimatorStatus"
+
+    exception_states :IO_ERROR
+end
