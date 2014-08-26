@@ -48,7 +48,7 @@ bool Task::startHook()
         return false;
     if(activity){
         activity->watch(driver->getFileDescriptor());
-        activity->setTimeout(_timeout.get());
+        activity->setTimeout(_timeout.get()*1000.0);
     }
     timestamp_estimator->reset();
     return true;
