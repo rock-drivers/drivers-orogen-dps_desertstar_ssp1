@@ -16,6 +16,8 @@ task_context 'Task' do
     #The default timeout for the device before a ioerror is announces
     property("timeout","/double",0.5)
 
+    property("variance","/double",0.0216505327374).dynamic
+
 #    ## Smoothing parameters
 #    property("window_size", "int", 0).
 #        doc "Window size of the smoothing. A size smaller than 2 deactivates the smoothing."

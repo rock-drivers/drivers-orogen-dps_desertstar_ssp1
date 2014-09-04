@@ -28,6 +28,11 @@ Task::~Task()
     delete timestamp_estimator;
 }
 
+bool Task::setVariance(double value)
+{
+ driver->updateVaricance(value);
+ return(dps_desertstar_ssp1::TaskBase::setVariance(value));
+}
 
 
 /// The following lines are template definitions for the various state machine
@@ -40,6 +45,7 @@ bool Task::configureHook()
         return false;
 
     activity = getActivity<RTT::extras::FileDescriptorActivity>();
+    updateDynamicProperties();
     return driver->openSerial(_port.get(),4800);
 }
 bool Task::startHook()

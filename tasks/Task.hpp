@@ -33,6 +33,7 @@ namespace dps_desertstar_ssp1 {
     {
 	friend class TaskBase;
     protected:
+        virtual bool setVariance(double value);
         RTT::extras::FileDescriptorActivity* activity;
         Driver *driver;
         aggregator::TimestampEstimator* timestamp_estimator;
