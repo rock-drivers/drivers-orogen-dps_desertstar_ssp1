@@ -57,6 +57,7 @@ bool Task::startHook()
         activity->setTimeout(_timeout.get()*1000.0);
     }
     timestamp_estimator->reset();
+    driver->setReadTimeout(_read_timeout.value());
     return true;
 }
 
